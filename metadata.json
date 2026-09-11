@@ -1,0 +1,7 @@
+{
+  "name": "Viverci — Scegli la vita che vuoi viverci",
+  "description": "Viverci ti aiuta a capire com'è davvero vivere in una città prima di scegliere di trasferirti.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
