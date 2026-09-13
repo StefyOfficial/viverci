@@ -6,7 +6,7 @@ export const WhyViverciExists: React.FC = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="max-w-3xl">
+        <div className="max-w-3xl mx-auto text-center">
           <span className="text-xs uppercase tracking-widest font-extrabold text-[#C08235] block mb-3">
             PERCHÉ VIVERCI ESISTE
           </span>
