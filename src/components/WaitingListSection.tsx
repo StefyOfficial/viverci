@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, CheckCircle2, ArrowRight, Instagram, Sparkles, Heart } from 'lucide-react';
 import { ViverciLogo } from './ViverciLogo';
+import {
+  submitToWaitingList,
+  getSavedWaitingList,
+  clearSavedWaitingList,
+  WAITING_LIST_EVENT,
+} from '../services/waitingList';
 
 export const WaitingListSection: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -10,14 +16,38 @@ export const WaitingListSection: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    const saved = localStorage.getItem('viverci_waiting_email');
-    if (saved) {
-      setEmail(saved);
+    const { email: savedEmail, reason: savedReason } = getSavedWaitingList();
+    if (savedEmail) {
+      setEmail(savedEmail);
       setIsSubmitted(true);
     }
+    if (savedReason) {
+      setReason(savedReason);
+    }
+
+    const handleWaitingListUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<{ email: string | null; reason: string | null }>;
+      if (customEvent.detail?.email) {
+        setEmail(customEvent.detail.email);
+        setIsSubmitted(true);
+        if (customEvent.detail.reason) {
+          setReason(customEvent.detail.reason);
+        }
+        setErrorMessage('');
+      } else {
+        setIsSubmitted(false);
+        setEmail('');
+        setReason('');
+      }
+    };
+
+    window.addEventListener(WAITING_LIST_EVENT, handleWaitingListUpdate);
+    return () => {
+      window.removeEventListener(WAITING_LIST_EVENT, handleWaitingListUpdate);
+    };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
 
@@ -27,21 +57,23 @@ export const WaitingListSection: React.FC = () => {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    const result = await submitToWaitingList({ email, reason });
+    setIsLoading(false);
+
+    if (result.success) {
       setIsSubmitted(true);
-      localStorage.setItem('viverci_waiting_email', email);
-      if (reason) {
-        localStorage.setItem('viverci_waiting_reason', reason);
-      }
-    }, 450);
+      setErrorMessage('');
+    } else {
+      setErrorMessage(result.error || 'Qualcosa non ha funzionato. Riprova tra poco.');
+    }
   };
 
   const handleReset = () => {
+    clearSavedWaitingList();
     setIsSubmitted(false);
     setEmail('');
     setReason('');
-    localStorage.removeItem('viverci_waiting_email');
+    setErrorMessage('');
   };
 
   const reasons = [
