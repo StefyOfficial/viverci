@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroTeaser } from './components/HeroTeaser';
-import { QuickEmailCTA } from './components/QuickEmailCTA';
 import { WhyViverciExists } from './components/WhyViverciExists';
 import { VisitingVsLiving } from './components/VisitingVsLiving';
 import { HowViverciWorks } from './components/HowViverciWorks';
@@ -34,9 +33,6 @@ export default function App() {
           onOpenDiscovery={() => setIsDiscoveryOpen(true)}
           onScrollToExplore={handleScrollToExplore}
         />
-
-        {/* Nuova CTA Email Semplice */}
-        <QuickEmailCTA />
 
         {/* 3. Perché Viverci Esiste (I dati ISTAT & Transizione) */}
         <WhyViverciExists />
