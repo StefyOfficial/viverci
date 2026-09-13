@@ -5,7 +5,24 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      {
+        name: 'netlify-forms-dev-handler',
+        configureServer(server) {
+          server.middlewares.use((req, res, next) => {
+            if (req.method === 'POST') {
+              res.statusCode = 200;
+              res.setHeader('Content-Type', 'text/plain');
+              res.end('OK');
+              return;
+            }
+            next();
+          });
+        },
+      },
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

@@ -1,3 +1,4 @@
+export const NETLIFY_FORM_NAME = 'viverci-waiting-list';
 export const WAITING_LIST_STORAGE_KEY = 'viverci_waiting_email';
 export const WAITING_LIST_REASON_KEY = 'viverci_waiting_reason';
 export const WAITING_LIST_EVENT = 'viverci:waitinglist_updated';
@@ -5,6 +6,7 @@ export const WAITING_LIST_EVENT = 'viverci:waitinglist_updated';
 export interface WaitingListSubmission {
   email: string;
   reason?: string;
+  botField?: string;
 }
 
 export interface WaitingListResult {
@@ -13,11 +15,12 @@ export interface WaitingListResult {
 }
 
 /**
- * Validates and submits an email (and optional reason) to the shared waiting list.
+ * Validates and submits an email (and optional reason) to the shared Netlify Form 'viverci-waiting-list'.
  */
 export async function submitToWaitingList({
   email,
   reason,
+  botField,
 }: WaitingListSubmission): Promise<WaitingListResult> {
   const trimmed = email.trim();
 
@@ -29,10 +32,27 @@ export async function submitToWaitingList({
     };
   }
 
-  // Simulate network request
-  await new Promise((resolve) => setTimeout(resolve, 450));
-
   try {
+    const formData = new URLSearchParams();
+    formData.append('form-name', NETLIFY_FORM_NAME);
+    formData.append('email', trimmed);
+    if (reason && reason.trim()) {
+      formData.append('reason', reason.trim());
+    }
+    if (botField) {
+      formData.append('bot-field', botField);
+    }
+
+    const response = await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Submission failed with status: ${response.status}`);
+    }
+
     localStorage.setItem(WAITING_LIST_STORAGE_KEY, trimmed);
     if (reason && reason.trim()) {
       localStorage.setItem(WAITING_LIST_REASON_KEY, reason.trim());

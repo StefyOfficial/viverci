@@ -11,6 +11,7 @@ import {
 export const WaitingListSection: React.FC = () => {
   const [email, setEmail] = useState('');
   const [reason, setReason] = useState<string>('');
+  const [botField, setBotField] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -57,7 +58,7 @@ export const WaitingListSection: React.FC = () => {
     }
 
     setIsLoading(true);
-    const result = await submitToWaitingList({ email, reason });
+    const result = await submitToWaitingList({ email, reason, botField });
     setIsLoading(false);
 
     if (result.success) {
@@ -73,6 +74,7 @@ export const WaitingListSection: React.FC = () => {
     setIsSubmitted(false);
     setEmail('');
     setReason('');
+    setBotField('');
     setErrorMessage('');
   };
 
@@ -115,7 +117,28 @@ export const WaitingListSection: React.FC = () => {
             {/* Form */}
             <div className="mt-8 pt-2">
               {!isSubmitted ? (
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form
+                  name="viverci-waiting-list"
+                  method="POST"
+                  data-netlify="true"
+                  data-netlify-honeypot="bot-field"
+                  onSubmit={handleSubmit}
+                  className="space-y-6"
+                >
+                  <input type="hidden" name="form-name" value="viverci-waiting-list" />
+                  <input type="hidden" name="reason" value={reason} />
+                  <p className="hidden" aria-hidden="true">
+                    <label>
+                      Non compilare questo campo:
+                      <input
+                        name="bot-field"
+                        tabIndex={-1}
+                        value={botField}
+                        onChange={(e) => setBotField(e.target.value)}
+                        autoComplete="off"
+                      />
+                    </label>
+                  </p>
                   {/* Email input + CTA */}
                   <div>
                     <label htmlFor="waiting-email" className="block text-xs font-bold uppercase tracking-wider text-[#FAF9F5]/70 mb-2.5">
@@ -128,6 +151,7 @@ export const WaitingListSection: React.FC = () => {
                         </div>
                         <input
                           id="waiting-email"
+                          name="email"
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
@@ -197,7 +221,7 @@ export const WaitingListSection: React.FC = () => {
                     </div>
                     <div>
                       <h4 className="text-lg sm:text-xl font-bold text-[#FAF9F5]">
-                        Sei nella waiting list!
+                        Grazie! Ti avviseremo quando Viverci sarà pronto.
                       </h4>
                       <p className="text-xs sm:text-sm text-[#FAF9F5]/80">
                         Ti avviseremo all'indirizzo <strong className="text-[#FAF9F5]">{email}</strong> appena Viverci sarà online.

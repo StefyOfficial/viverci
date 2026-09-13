@@ -9,6 +9,7 @@ import {
 
 export const QuickEmailCTA: React.FC = () => {
   const [email, setEmail] = useState('');
+  const [botField, setBotField] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -49,7 +50,7 @@ export const QuickEmailCTA: React.FC = () => {
     }
 
     setIsLoading(true);
-    const result = await submitToWaitingList({ email });
+    const result = await submitToWaitingList({ email, botField });
     setIsLoading(false);
 
     if (result.success) {
@@ -64,6 +65,7 @@ export const QuickEmailCTA: React.FC = () => {
     clearSavedWaitingList();
     setIsSubmitted(false);
     setEmail('');
+    setBotField('');
     setErrorMessage('');
   };
 
@@ -100,10 +102,27 @@ export const QuickEmailCTA: React.FC = () => {
             <div className="mt-6 sm:mt-8">
               {!isSubmitted ? (
                 <form
+                  name="viverci-waiting-list"
+                  method="POST"
+                  data-netlify="true"
+                  data-netlify-honeypot="bot-field"
                   onSubmit={handleSubmit}
                   noValidate
                   className="max-w-xl mx-auto"
                 >
+                  <input type="hidden" name="form-name" value="viverci-waiting-list" />
+                  <p className="hidden" aria-hidden="true">
+                    <label>
+                      Non compilare questo campo:
+                      <input
+                        name="bot-field"
+                        tabIndex={-1}
+                        value={botField}
+                        onChange={(e) => setBotField(e.target.value)}
+                        autoComplete="off"
+                      />
+                    </label>
+                  </p>
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     {/* Campo email */}
                     <div className="relative flex-1">
